@@ -68,6 +68,11 @@ class SpyStorage: Storage {
         return stubbedFetchPersonaTagsForProcessId
     }
 
+    var stubbedFetchPermanentCustomProperty: String?
+    func fetchPermanentCustomProperty(key: String) -> String? {
+        stubbedFetchPermanentCustomProperty
+    }
+
     var didCallCreate = false
     func createLog(
         id: EmbraceIdentifier,

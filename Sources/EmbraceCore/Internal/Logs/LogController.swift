@@ -125,6 +125,7 @@ class LogController: LogControllable {
             .addLogType(type)
             .addApplicationState()
             .addSessionIdentifier()
+            .addUserIdentifier()
 
         // We want to ensure the backtrace is taken on this thread,
         // but added from the queue as to not use up possibly main thread resources.

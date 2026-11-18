@@ -39,6 +39,38 @@ class EmbraceLogAttributesBuilderTests: XCTestCase {
         thenResultingAttributes(is: ["session.id": identifier.stringValue])
     }
 
+    // MARK: - addUserIdentifier Tests
+
+    func testOnHavingUserIdentifier_addUserIdentifier_addsUserIdToAttributes() {
+        givenSessionController()
+        givenMetadataFetcher(with: [
+            MockMetadata(
+                key: "emb.user.identifier",
+                value: "0a7ce66005fe2a08",
+                type: .customProperty,
+                lifespan: .permanent,
+                lifespanId: ""
+            )
+        ])
+        givenEmbraceLogAttributesBuilder()
+
+        sut.addUserIdentifier()
+        whenInvokingBuild()
+
+        thenResultingAttributes(is: ["user.id": "0a7ce66005fe2a08"])
+    }
+
+    func testOnNotHavingUserIdentifier_addUserIdentifier_addsNothingToAttributes() {
+        givenSessionController()
+        givenMetadataFetcher()
+        givenEmbraceLogAttributesBuilder()
+
+        sut.addUserIdentifier()
+        whenInvokingBuild()
+
+        thenResultingAttributes(is: .empty())
+    }
+
     func testOnNotHavingSession_addSessionIdentifier_addsNothingToAttributes() {
         givenSessionControllerWithNoSession()
         givenMetadataFetcher()

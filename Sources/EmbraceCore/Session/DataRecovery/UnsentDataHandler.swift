@@ -234,6 +234,7 @@ class UnsentDataHandler {
             .addApplicationProperties()
             .addApplicationState()
             .addSessionIdentifier()
+            .addUserIdentifier()
             .addCrashReportProperties()
             .build()
 

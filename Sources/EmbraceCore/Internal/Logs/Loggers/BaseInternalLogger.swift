@@ -174,6 +174,7 @@ class BaseInternalLogger: InternalLogger {
             .addLogType(.internal)
             .addApplicationState()
             .addSessionIdentifier()
+            .addUserIdentifier()
             .build()
 
         // send log

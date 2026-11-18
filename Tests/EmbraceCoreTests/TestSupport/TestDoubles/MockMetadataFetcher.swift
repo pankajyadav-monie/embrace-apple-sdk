@@ -48,4 +48,10 @@ class MockMetadataFetcher: EmbraceStorageMetadataFetcher {
             record.type == .personaTag && record.lifespan == .process && record.lifespanId == processId.stringValue
         }
     }
+
+    func fetchPermanentCustomProperty(key: String) -> String? {
+        metadata.first { record in
+            record.key == key && record.type == .customProperty && record.lifespan == .permanent
+        }?.value
+    }
 }

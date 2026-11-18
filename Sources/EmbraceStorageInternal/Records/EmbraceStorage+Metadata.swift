@@ -16,6 +16,14 @@ public protocol EmbraceStorageMetadataFetcher: AnyObject {
     func fetchCustomPropertiesForSessionId(_ sessionId: EmbraceIdentifier) -> [EmbraceMetadata]
     func fetchPersonaTagsForSessionId(_ sessionId: EmbraceIdentifier) -> [EmbraceMetadata]
     func fetchPersonaTagsForProcessId(_ processId: EmbraceIdentifier) -> [EmbraceMetadata]
+    /// Returns the value of a permanent custom property (for example the user identifier), if set.
+    func fetchPermanentCustomProperty(key: String) -> String?
+}
+
+extension EmbraceStorage {
+    public func fetchPermanentCustomProperty(key: String) -> String? {
+        fetchMetadata(key: key, type: .customProperty, lifespan: .permanent)?.value
+    }
 }
 
 extension EmbraceStorage {

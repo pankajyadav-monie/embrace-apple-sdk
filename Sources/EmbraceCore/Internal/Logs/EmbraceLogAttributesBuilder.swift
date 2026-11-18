@@ -133,6 +133,20 @@ class EmbraceLogAttributesBuilder {
         return self
     }
 
+    /// Adds the user identifier set via `userIdentifier` as the OTel attribute `user.id`.
+    /// Only the identifier is added, never the user name or email.
+    @discardableResult
+    func addUserIdentifier() -> Self {
+        guard attributes["user.id"] == nil,
+            let userId = storage?.fetchPermanentCustomProperty(key: UserResourceKey.identifier.rawValue),
+            !userId.isEmpty
+        else {
+            return self
+        }
+        attributes["user.id"] = userId
+        return self
+    }
+
     @discardableResult
     func addSessionIdentifier() -> Self {
         guard attributes[LogSemantics.keySessionId] == nil else {
