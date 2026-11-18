@@ -23,6 +23,8 @@ package class EmbraceSpanProcessor: SpanProcessor {
     let resourceProvider: (() -> Resource?)?
     private weak var logger: InternalLogger? = nil
     let sessionIdProvider: (() -> String?)?
+    /// Returns the identifier set via `userIdentifier`, exported as the OTel `user.id` attribute.
+    let userIdProvider: (() -> String?)?
     let criticalResourceGroup: DispatchGroup?
 
     weak var sdkStateProvider: EmbraceSDKStateProvider?
@@ -39,6 +41,7 @@ package class EmbraceSpanProcessor: SpanProcessor {
         sdkStateProvider: EmbraceSDKStateProvider,
         logger: InternalLogger? = nil,
         sessionIdProvider: (() -> String?)? = nil,
+        userIdProvider: (() -> String?)? = nil,
         criticalResourceGroup: DispatchGroup? = nil,
         resourceProvider: (() -> Resource?)? = nil
     ) {
@@ -48,6 +51,7 @@ package class EmbraceSpanProcessor: SpanProcessor {
         self.sdkStateProvider = sdkStateProvider
         self.logger = logger
         self.sessionIdProvider = sessionIdProvider
+        self.userIdProvider = userIdProvider
         self.resourceProvider = resourceProvider
         self.criticalResourceGroup = criticalResourceGroup
     }
@@ -182,6 +186,11 @@ package class EmbraceSpanProcessor: SpanProcessor {
         // add session id attribute
         if let sessionId = sessionIdProvider?() {
             span.setAttribute(key: SpanSemantics.keySessionId, value: .string(sessionId))
+        }
+
+        // add the user identifier as the standard OTel attribute user.id (identifier only, never name or email)
+        if let userId = userIdProvider?(), !userId.isEmpty {
+            span.setAttribute(key: "user.id", value: .string(userId))
         }
     }
 

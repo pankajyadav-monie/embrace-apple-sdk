@@ -65,6 +65,9 @@ extension Embrace {
             sdkStateProvider: sdkStateProvider,
             logger: Embrace.logger,
             sessionIdProvider: { sessionController.currentSession?.idRaw },
+            userIdProvider: {
+                storage.fetchMetadata(key: UserResourceKey.identifier.rawValue, type: .customProperty, lifespan: .permanent)?.value
+            },
             criticalResourceGroup: captureServicesGroup,
             resourceProvider: { ResourceStorageExporter(storage: storage, resource: resource).getResource() }
         )

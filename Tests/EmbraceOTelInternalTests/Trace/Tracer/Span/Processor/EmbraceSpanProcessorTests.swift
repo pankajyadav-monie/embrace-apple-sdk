@@ -158,6 +158,52 @@ final class EmbraceSpanProcessorTests: XCTestCase {
         XCTAssertEqual(exporter.exportedSpans[span.context.spanId]!.attributes["session.id"], .string(TestConstants.sessionId.stringValue))
     }
 
+    func test_startSpan_addsUserIdAttribute_whenIdentifierSet() throws {
+        let userProcessor = EmbraceSpanProcessor(
+            spanProcessors: [childProcessor],
+            spanExporters: [exporter],
+            sdkStateProvider: sdkStateProvider,
+            userIdProvider: { "0a7ce66005fe2a08" }
+        )
+        let expectation = expectation(description: "didExport onStart")
+        exporter.onExportComplete {
+            expectation.fulfill()
+        }
+
+        let span = createSpanData(processor: userProcessor)
+
+        wait(for: [expectation], timeout: .defaultTimeout)
+        XCTAssertEqual(childProcessor.startedSpans[span.context.spanId]!.attributes["user.id"], .string("0a7ce66005fe2a08"))
+        XCTAssertEqual(exporter.exportedSpans[span.context.spanId]!.attributes["user.id"], .string("0a7ce66005fe2a08"))
+    }
+
+    func test_startSpan_noUserIdAttribute_whenIdentifierMissingOrBlank() throws {
+        let noUserProcessor = EmbraceSpanProcessor(
+            spanProcessors: [childProcessor],
+            spanExporters: [exporter],
+            sdkStateProvider: sdkStateProvider,
+            userIdProvider: { nil }
+        )
+        let blankUserProcessor = EmbraceSpanProcessor(
+            spanProcessors: [childProcessor],
+            spanExporters: [exporter],
+            sdkStateProvider: sdkStateProvider,
+            userIdProvider: { "" }
+        )
+        let expectation = expectation(description: "didExport onStart")
+        expectation.expectedFulfillmentCount = 2
+        exporter.onExportComplete {
+            expectation.fulfill()
+        }
+
+        let missing = createSpanData(processor: noUserProcessor)
+        let blank = createSpanData(processor: blankUserProcessor)
+
+        wait(for: [expectation], timeout: .defaultTimeout)
+        XCTAssertNil(exporter.exportedSpans[missing.context.spanId]!.attributes["user.id"])
+        XCTAssertNil(exporter.exportedSpans[blank.context.spanId]!.attributes["user.id"])
+    }
+
     func test_endingSpan_sdkDisabled() throws {
         sdkStateProvider.isEnabled = false
 
